@@ -22,8 +22,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          tag_name: testing
+          release_name: testing
           body: ""
           draft: false
           prerelease: false
@@ -132,8 +132,6 @@ jobs:
           node-version: 14
       - name: Publish to NPM
         shell: bash
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           sed -e "s/NPM_VERSION/$(./scripts/get-version)/g" -i npm/package.json
           sed -e "s/PACKAGE_VERSION/$(./scripts/get-version)/g" -i npm/install.js
@@ -141,4 +139,3 @@ jobs:
           cp ../README.md ./README.md
           cp ../CONTRIBUTING.md ./CONTRIBUTING.md
           cp ../LICENSE ./LICENSE
-          npm publish --non-interactive --access public
