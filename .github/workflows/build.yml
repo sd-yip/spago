@@ -83,7 +83,7 @@ jobs:
           path: |
             /root/.stack
             ~/.stack
-          key: ${{ runner.os }}-${{ hashFiles('stack.yaml') }}-2
+          key: ${{ runner.os }}-${{ hashFiles('stack.yaml') }}-2-testing
       - name: Cache C:\sr on Windows OS
         uses: actions/cache@v2
         if: runner.os == 'Windows'
