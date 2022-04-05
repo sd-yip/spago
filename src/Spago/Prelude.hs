@@ -67,6 +67,7 @@ module Spago.Prelude
   , findExecutableOrDie
   , findExecutable
   , runWithOutput
+  , runProcessWithOutput
   -- * Other
   , Dhall.Core.throws
   , repr
@@ -109,7 +110,7 @@ import           RIO.Orphans                           as X
 import           Safe                                  (headMay, lastMay)
 import           System.FilePath                       (isAbsolute, pathSeparator, (</>))
 import           Turtle                                (FilePath, appendonly, chmod,
-                                                        executable, mktree, repr, shell,
+                                                        executable, mktree, proc, repr, shell,
                                                         shellStrict, shellStrictWithErr,
                                                         systemStrictWithErr, testdir)
 import           UnliftIO.Directory                    (getModificationTime, makeAbsolute)
@@ -268,6 +269,14 @@ runWithOutput :: HasLogFunc env => Text -> Text -> Text -> RIO env ()
 runWithOutput command success failure = do
   logDebug $ "Running command: `" <> display command <> "`"
   shell command empty >>= \case
+    ExitSuccess -> logInfo $ display success
+    ExitFailure _ -> die [ display failure ]
+
+-- | Run the given command.
+runProcessWithOutput :: HasLogFunc env => Text -> [Text] -> Text -> Text -> RIO env ()
+runProcessWithOutput command arguments success failure = do
+  logDebug $ "Running command: `" <> display (Text.intercalate " " $ command : arguments) <> "`"
+  proc command arguments empty >>= \case
     ExitSuccess -> logInfo $ display success
     ExitFailure _ -> die [ display failure ]
 

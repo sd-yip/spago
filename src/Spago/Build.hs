@@ -416,27 +416,27 @@ bundleWithEsbuild withMain srcMap (ModuleName moduleName) (TargetPath targetPath
   esbuild <- getESBuild
   let
     platformOpt = case platform of
-      Browser -> " --platform=browser"
-      Node -> " --platform=node"
+      Browser -> "--platform=browser"
+      Node -> "--platform=node"
     minifyOpt = case minify of
-      NoMinify -> ""
-      Minify -> " --minify"
+      NoMinify -> []
+      Minify -> ["--minify"]
     srcMapOpt = case srcMap of
-      WithSrcMap -> " --sourcemap"
-      WithoutSrcMap -> ""
+      WithSrcMap -> ["--sourcemap"]
+      WithoutSrcMap -> []
     successMsg = "Bundle succeeded and output file to " <> targetPath
     failMsg = "Bundle failed."
-    esbuildBase = esbuild <> platformOpt <> minifyOpt <> srcMapOpt <> " --format=esm --bundle --outfile=" <> targetPath
+    esbuildBase = join [minifyOpt, srcMapOpt] <> [platformOpt, "--format=esm", "--bundle", "--outfile=" <> targetPath]
   case withMain of
       WithMain -> do
+        writeTextFile targetPath $ "import { main } from './output/" <> moduleName <> "/index.js'; main();"
         -- Since `targetPath` is used as both input/output,
         -- we also need the `--allow-overwrite` flag.
-        let cmd = esbuildBase <> " --allow-overwrite " <> targetPath
-        writeTextFile targetPath $ "import { main } from './output/" <> moduleName <> "/index.js'; main();"
-        runWithOutput cmd successMsg failMsg
+        let arguments = esbuildBase <> ["--allow-overwrite", targetPath]
+        runProcessWithOutput esbuild arguments successMsg failMsg
       WithoutMain -> do
-        let cmd = esbuildBase <> " output/" <> moduleName <> "/index.js"
-        runWithOutput cmd successMsg failMsg
+        let arguments = esbuildBase <> ["output/" <> moduleName <> "/index.js"]
+        runProcessWithOutput esbuild arguments successMsg failMsg
   where
   getESBuild = do
     maybeESBuild <- findExecutable "esbuild"
