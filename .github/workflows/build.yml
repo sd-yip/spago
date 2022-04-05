@@ -47,11 +47,9 @@ jobs:
         if: runner.os != 'Linux'
         uses: haskell/actions/setup@v1
         with:
-          ghc-version: '8.10.7'
           stack-version: ${{ env.STACK_VERSION }}
           enable-stack: true
           stack-no-global: true
-          stack-setup-ghc: true
       - name: Check Stack version and fix root access (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -89,7 +87,7 @@ jobs:
           path: |
             /root/.stack
             ~/.stack
-          key: ${{ runner.os }}-${{ hashFiles('stack.yaml') }}-2
+          key: ${{ runner.os }}-${{ hashFiles('stack.yaml') }}-3
       - name: Cache C:\sr on Windows OS
         uses: actions/cache@v2
         if: runner.os == 'Windows'
@@ -99,7 +97,7 @@ jobs:
           path: |
             C:\sr
             $HOME\AppData\Local\Programs\stack\x86_64-windows
-          key: ${{ runner.os }}-${{ hashFiles('stack.yaml') }}-1
+          key: ${{ runner.os }}-${{ hashFiles('stack.yaml') }}-2
 
       - run: npm install -g purescript@0.14.0 psc-package@3.0.1 bower@1.8.8 esbuild@0.14.28
 
